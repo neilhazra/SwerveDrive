@@ -68,15 +68,14 @@ public class DriveTrain extends Subsystem {
 	 * @param backRight
 	 */
 	public void drive(double frontLeft, double frontRight, double backLeft,double backRight,double x, double y) {
-		//frontLeftCIM.set(frontLeft);
-		//frontRightCIM.set(frontRight);
-		//backLeftCIM.set(backLeft);
-		//backRightCIM.set(backRight);
+		frontLeftCIM.set(frontLeft);
+		frontRightCIM.set(frontRight);
+		backLeftCIM.set(backLeft);
+		backRightCIM.set(backRight);
+		frontTurn.set(x);
+		backTurn.set(y);
 		
-		backRightCIM.set(-x);
-		
-		//frontTurn.set(x);
-		//backTurn.set(y);
+		//backRightCIM.set(-x);
 		}
 	public void turnDrive(double x, double y)	{
 		frontPID.setSetpoint(x);
