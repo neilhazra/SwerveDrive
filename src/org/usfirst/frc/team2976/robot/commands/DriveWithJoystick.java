@@ -12,61 +12,59 @@ import util.SwerveDrive.Vector;
  *
  */
 public class DriveWithJoystick extends Command {
-	PIDMain frontSteering;
-	PIDMain backSteering;
-	SwerveDrive swerveDrive;
-	double frontWeightedAverage;
-	double backWeightedAverage;
-
-	Vector[] temp;
-	// TODO
-	double kp = 0.0001;
-	double ki = 0;
-	double kd = 0;
-
+	boolean mode = false;
+	long prevTime = 0;
+	final long BUTTON_PAUSE = 500;
 	public DriveWithJoystick() {
 		requires(Robot.drivetrain);
-
-		frontSteering = new PIDMain(Robot.drivetrain.frontPIDSource, 0, 100, kp, ki, kd);
-		backSteering = new PIDMain(Robot.drivetrain.backPIDSource, 0, 100, kp, ki, kd);
-		swerveDrive = new SwerveDrive();
-	
 	}
-
 	protected void initialize() {
-		frontSteering.setSetpoint(0);
-		backSteering.setSetpoint(0);
 	}
-
 	protected void execute() {
+
 		double y = -Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
 		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
 		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
+		
 		if (Math.abs(x) < 0.05)
 			x = 0;
 		if (Math.abs(y) < 0.05)
-			y = 0;
+			y = 0;	
 		if (Math.abs(rx) < 0.05)
 			rx = 0;
-		double[] temp = map(x);
-		Robot.drivetrain.turnDrive(temp[0], temp[1]);
-		Robot.drivetrain.drive(y, y, y, y, Robot.drivetrain.getFrontOutput(), Robot.drivetrain.getBackOutput());
+		
+		if (Robot.oi.joystick.getRawButton(OI.Button.X.getBtnNumber()) && (System.currentTimeMillis() - prevTime) > BUTTON_PAUSE) {
+			mode= !mode;
+			prevTime = System.currentTimeMillis();
+		}
+		if (mode) {
+			//double[] temp = map(x);
+			//Robot.drivetrain.turnDrive(temp[0], temp[1]);
+			Robot.drivetrain.turnDrive(90*x, -90*x);
+		} else {
+			Robot.drivetrain.turnDrive(90*x, 90*x);
+		}
+		Robot.drivetrain.drive(y, y, y, y, constrain(Robot.	drivetrain.getFrontOutput(),-0.33,0.33), constrain(Robot.drivetrain.getBackOutput(),-0.33,0.33));
 	}
 	public double[] map(double x) {
-		double[] power = new double[2];
+		double[] turnDegree = new double[2];
 		if (x > 0) {
-			power[0] = Math.pow(x, 2);
-			power[1] = -8 * Math.pow((x - 0.5), 3);
+			turnDegree[0] = Math.pow(x, 2);
 		}
 		if (x < 0) {
-			power[0] = -Math.pow(x, 2);
-			power[1] = 8 * Math.pow((x - 0.5), 3);
+			turnDegree[0] = -Math.pow(x, 2);
 		}
-		power[0] *= 90;
-		power[1] *= 90;
-		power[0] = constrain(power[0],-90,90);
-		power[1] = constrain(power[1],-90,90);
-		return power;
+		
+		if (x > 0.5) {
+			turnDegree[1] = -90*8*Math.pow(x-0.5, 3);
+		}
+		if (x < -0.5) {
+			turnDegree[1] = -90*8*Math.pow(x+0.5, 3);
+		}
+		
+		turnDegree[0] = constrain(turnDegree[0],-90,90);
+		turnDegree[1] = constrain(turnDegree[1],-90,90);
+		return turnDegree;
 	}
 
 	public double constrain(double x, double lowerLimit, double upperLimit)	{

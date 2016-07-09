@@ -1,5 +1,7 @@
 package org.usfirst.frc.team2976.robot.subsystems;
 import org.usfirst.frc.team2976.robot.commands.DriveWithJoystick;
+
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -22,21 +24,18 @@ public class DriveTrain extends Subsystem {
 	public PIDMain frontPID, backPID;
 	
 	public DriveTrain() {
-		// Configure drive motors
-		frontLeftCIM = new Jaguar(1);
-		frontRightCIM = new Jaguar(2);
-		backLeftCIM = new Jaguar(3);
-		backRightCIM = new Jaguar(4);
-		frontTurn = new Jaguar(5);
-		frontTurn = new Jaguar(6);
+		frontLeftCIM = new Jaguar(3);
+		frontRightCIM = new Jaguar(1);
+		backLeftCIM = new Jaguar(4);
+		backRightCIM = new Jaguar(0);
 		
-		// Configure the RobotDrive to reflect the fact that all our motors are
-		// wired backwards and our drivers sensitivity preferences.
-		// Configure encoders
-		frontEncoder = new Encoder(9, 8);
-		backEncoder = new Encoder(3,4);
+		frontTurn = new CANTalon(1);
+		backTurn = new CANTalon(2);
 		
-		frontPIDSource = new PIDSource(){
+		frontEncoder = new Encoder(1, 0);
+		backEncoder = new Encoder(2	,3);
+		
+		frontPIDSource = new PIDSource()	{
 			public double getInput() {
 				SmartDashboard.putNumber("InputFront", frontEncoder.get());
 				return frontEncoder.get() ;	
@@ -48,16 +47,9 @@ public class DriveTrain extends Subsystem {
 				return backEncoder.get();
 			}		
 		};
-		
-		frontPID = new PIDMain(frontPIDSource, 0, 100, 0.01, 0.001, 0.0);
-
-		backPID = new PIDMain(backPIDSource, 0, 100, 0.01, 0.001, 0.0);
+		frontPID = new PIDMain(frontPIDSource, 0, 100, 0.007, 0.001, 0.0);
+		backPID = new PIDMain(backPIDSource, 0, 100, 0.007, 0.001, 0.0);
 	}
-	/**
-	 * When other commands aren't using the drivetrain, allow swerve drive with
-	 * the joystick.
-	 */
-	
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoystick());
 	}
@@ -65,17 +57,15 @@ public class DriveTrain extends Subsystem {
 	 * @param frontLeft
 	 * @param frontRight
 	 * @param backLeft
-	 * @param backRight
+	 * @param backRight 	
 	 */
 	public void drive(double frontLeft, double frontRight, double backLeft,double backRight,double x, double y) {
-		frontLeftCIM.set(frontLeft);
+		frontLeftCIM.set(-frontLeft);
 		frontRightCIM.set(frontRight);
-		backLeftCIM.set(backLeft);
-		backRightCIM.set(backRight);
+		backLeftCIM.set(-backLeft);
+		backRightCIM.set(-backRight);
 		frontTurn.set(x);
 		backTurn.set(y);
-		
-		//backRightCIM.set(-x);
 		}
 	public void turnDrive(double x, double y)	{
 		frontPID.setSetpoint(x);

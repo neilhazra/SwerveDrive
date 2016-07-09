@@ -18,7 +18,7 @@ public class SwerveDrive {
 	Vector directionVector = new Vector(0, 0);
 	Vector[] wheelDirectionVectors = new Vector[4];
 	Vector[] finalVectors = new Vector[4];
-
+	
 	public SwerveDrive() {
 		for (int i = 0; i < 4; i++) {
 			wheelDirectionVectors[i] = new Vector(0, 0);
