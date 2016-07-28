@@ -71,6 +71,7 @@ public class PIDMain {
 	}
 	public void setSetpoint(double setpoint) {
 		this.setpoint = setpoint;
+		resetPID();
 	}
 	public void setOutputLimits(double min, double max)	{
 		outputMax = max;

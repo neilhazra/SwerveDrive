@@ -12,7 +12,7 @@ import util.SwerveDrive.Vector;
  *
  */
 public class DriveWithJoystick extends Command {
-	boolean mode = false;
+	boolean mode = true;
 	long prevTime = 0;
 	final long BUTTON_PAUSE = 500;
 	public DriveWithJoystick() {
@@ -22,9 +22,9 @@ public class DriveWithJoystick extends Command {
 	}
 	protected void execute() {
 
-		double y = -Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
-		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
-		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
+		double y = -0.5*Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
+		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
+		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
 		
 		if (Math.abs(x) < 0.05)
 			x = 0;
@@ -33,37 +33,40 @@ public class DriveWithJoystick extends Command {
 		if (Math.abs(rx) < 0.05)
 			rx = 0;
 		
-		if (Robot.oi.joystick.getRawButton(OI.Button.X.getBtnNumber()) && (System.currentTimeMillis() - prevTime) > BUTTON_PAUSE) {
-			mode= !mode;
-			prevTime = System.currentTimeMillis();
-		}
-		if (mode) {
-			//double[] temp = map(x);
-			//Robot.drivetrain.turnDrive(temp[0], temp[1]);
-			Robot.drivetrain.turnDrive(90*x, -90*x);
+		double diagonalright = Robot.oi.joystick.getRawAxis(OI.Axis.RTrigger.getAxisNumber());
+		double diagonalleft = Robot.oi.joystick.getRawAxis(OI.Axis.LTrigger.getAxisNumber());
+		
+		if (!(diagonalright>0.1 || diagonalleft>0.1)) {
+			double[] temp = map(x);
+			Robot.drivetrain.turnDrive(temp[0], temp[1]);
+			//Robot.drivetrain.turnDrive(93*x, -90*x);
 		} else {
-			Robot.drivetrain.turnDrive(90*x, 90*x);
+			if(diagonalright>diagonalleft){
+				Robot.drivetrain.turnDrive(120*diagonalright, 100*diagonalright);
+			} else	{
+				Robot.drivetrain.turnDrive(-120*diagonalleft, -100*diagonalleft);
+			}
 		}
-		Robot.drivetrain.drive(y, y, y, y, constrain(Robot.	drivetrain.getFrontOutput(),-0.33,0.33), constrain(Robot.drivetrain.getBackOutput(),-0.33,0.33));
+		Robot.drivetrain.drive(y, y, y, y, constrain(Robot.	drivetrain.getFrontOutput(),-0.5,0.5), constrain(Robot.drivetrain.getBackOutput(),-0.33,0.33));
 	}
 	public double[] map(double x) {
 		double[] turnDegree = new double[2];
 		if (x > 0) {
-			turnDegree[0] = Math.pow(x, 2);
+			turnDegree[0] = 120*Math.pow(x, 2);
 		}
 		if (x < 0) {
-			turnDegree[0] = -Math.pow(x, 2);
+			turnDegree[0] = -120*Math.pow(x, 2);
 		}
 		
 		if (x > 0.5) {
-			turnDegree[1] = -90*8*Math.pow(x-0.5, 3);
+			turnDegree[1] = -100*8*Math.pow(x-0.5, 3);
 		}
 		if (x < -0.5) {
-			turnDegree[1] = -90*8*Math.pow(x+0.5, 3);
+			turnDegree[1] = -100*8*Math.pow(x+0.5, 3);
 		}
 		
-		turnDegree[0] = constrain(turnDegree[0],-90,90);
-		turnDegree[1] = constrain(turnDegree[1],-90,90);
+		turnDegree[0] = constrain(turnDegree[0],-120,120);
+		turnDegree[1] = constrain(turnDegree[1],-100,100);
 		return turnDegree;
 	}
 

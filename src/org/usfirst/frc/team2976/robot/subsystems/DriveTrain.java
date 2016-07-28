@@ -28,7 +28,6 @@ public class DriveTrain extends Subsystem {
 		frontRightCIM = new Jaguar(1);
 		backLeftCIM = new Jaguar(4);
 		backRightCIM = new Jaguar(0);
-		
 		frontTurn = new CANTalon(1);
 		backTurn = new CANTalon(2);
 		
@@ -41,14 +40,14 @@ public class DriveTrain extends Subsystem {
 				return frontEncoder.get() ;	
 			}		
 		};
-		backPIDSource = new PIDSource(){
+		backPIDSource = new PIDSource(){	
 			public double getInput() {
 				SmartDashboard.putNumber("InputBack", backEncoder.get());
 				return backEncoder.get();
 			}		
 		};
-		frontPID = new PIDMain(frontPIDSource, 0, 100, 0.007, 0.001, 0.0);
-		backPID = new PIDMain(backPIDSource, 0, 100, 0.007, 0.001, 0.0);
+		frontPID = new PIDMain(frontPIDSource, 0, 100, 0.006, 0.001, 0.0);
+		backPID = new PIDMain(backPIDSource, 0, 100, 0.006, 0.001, 0.0);
 	}
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoystick());
