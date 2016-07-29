@@ -79,11 +79,7 @@ public class WaveFront {
 		}
 
 		boolean equals(SquareNode otherNode) {
-			if (this.x == otherNode.x && this.y == otherNode.y) {
-				return true;
-			} else {
-				return false;
-			}
+			return (this.x == otherNode.x && this.y == otherNode.y);
 		}
 
 		ArrayList<SquareNode> returnAdjacents() {
