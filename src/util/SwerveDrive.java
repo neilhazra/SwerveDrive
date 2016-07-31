@@ -45,29 +45,13 @@ public class SwerveDrive {
 			finalVectors[i] = wheelDirectionVectors[i].add(directionVector);
 		}
 		double mag;
-		if (finalVectors[0].r > 1) {
-			mag = finalVectors[0].getMagnitude();
-			for (int i = 0; i < 4; i++) {
-				finalVectors[i] = finalVectors[i].multiplyScalar(1 / mag);
-			}
-		}
-
-		if (finalVectors[1].r > 1) {
-			mag = finalVectors[1].getMagnitude();
-			for (int i = 0; i < 4; i++) {
-				finalVectors[i] = finalVectors[i].multiplyScalar(1 / mag);
-			}
-		}
-		if (finalVectors[2].r > 1) {
-			mag = finalVectors[2].getMagnitude();
-			for (int i = 0; i < 4; i++) {
-				finalVectors[i] = finalVectors[i].multiplyScalar(1 / mag);
-			}
-		}
-		if (finalVectors[3].r > 1) {
-			mag = finalVectors[3].getMagnitude();
-			for (int i = 0; i < 4; i++) {
-				finalVectors[i] = finalVectors[i].multiplyScalar(1 / mag);
+		
+		for (int i = 0; i < 4; i++) {
+			if (finalVectors[i].r > 1) {
+				mag = finalVectors[i].getMagnitude();
+				for (int j = 0; j < 4; j++) {
+					finalVectors[j] = finalVectors[j].multiplyScalar(1 / mag);
+				}
 			}
 		}
 
@@ -88,7 +72,7 @@ public class SwerveDrive {
 		}
 
 		/**
-		 * @param r
+		 * @param r radius
 		 * @param theta
 		 * @param isPolar
 		 */
@@ -114,7 +98,7 @@ public class SwerveDrive {
 			this.x = x;
 			this.y = y;
 			r = Math.hypot(x, y);
-			theta = Math.toDegrees(Math.atan2(y, x));
+			theta = getAngleDegrees();
 		}
 
 		public double getAngleDegrees() {
