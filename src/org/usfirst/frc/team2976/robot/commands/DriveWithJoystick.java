@@ -3,10 +3,6 @@ package org.usfirst.frc.team2976.robot.commands;
 import org.usfirst.frc.team2976.robot.OI;
 import org.usfirst.frc.team2976.robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import util.PIDMain;
-import util.SwerveDrive;
-import util.SwerveDrive.Vector;
 
 public class DriveWithJoystick extends Command {
 	boolean mode = true;
