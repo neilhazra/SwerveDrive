@@ -1,6 +1,9 @@
 # WPILib
 bin/
 build/
+dist/
+
+sysProps.xml
 
 # OS Files
 .DS_Store

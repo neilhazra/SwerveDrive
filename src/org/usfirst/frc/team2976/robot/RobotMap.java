@@ -22,4 +22,11 @@ public class RobotMap {
 	public static int backRightCIMPort = 0;
 	public static int frontTurnMotorPort = 1;
 	public static int backTurnMotorPort = 2;
+	
+	public static int frontEncoderAPort = 1;
+	public static int frontEncoderBPort = 0;
+	public static int backEncoderAPort = 2;
+	public static int backEncoderBPort = 3;
+	
+	public static int gyroPort = 0;
 }
