@@ -40,5 +40,17 @@ public class OI {
 	public OI() {
 		joystick = new Joystick(0);
 	}
+	
+	public double getJoystickX() {
+		return joystick.getX();
+	}
+	
+	public double getJoystickY() {
+		return joystick.getY();
+	}
+	
+	public double getJoystickZ() {
+		return joystick.getZ();
+	}
 }
 

@@ -18,9 +18,12 @@ public class DriveWithJoystick extends Command {
 
 	protected void execute() {
 
-		double y = -0.5 * Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
-		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
-		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
+//		double y = -0.5 * Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
+		double y = -0.5 * Robot.oi.getJoystickX();
+//		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
+		double x = -Robot.oi.getJoystickY();
+//		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
+		double rx = -Robot.oi.getJoystickX();
 
 		// if the joystick values are less than the threshold, set the joystick
 		// value to 0
@@ -34,7 +37,7 @@ public class DriveWithJoystick extends Command {
 		if (Math.abs(rx) < threshold) {
 			rx = 0;
 		}
-
+		/*
 		double diagonalright = Robot.oi.joystick.getRawAxis(OI.Axis.RTrigger.getAxisNumber());
 		double diagonalleft = Robot.oi.joystick.getRawAxis(OI.Axis.LTrigger.getAxisNumber());
 
@@ -52,6 +55,7 @@ public class DriveWithJoystick extends Command {
 				Robot.drivetrain.turnDrive(-120 * diagonalleft, -100 * diagonalleft);
 			}
 		}
+		*/
 		// drive the robot after making sure that the rotation of the front
 		// motors and the rotation for the back motors are safe
 		Robot.drivetrain.drive(y, y, y, y, constrain(Robot.drivetrain.getFrontOutput(), -0.5, 0.5),
