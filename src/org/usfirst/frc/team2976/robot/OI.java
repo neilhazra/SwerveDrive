@@ -52,5 +52,12 @@ public class OI {
 	public double getJoystickZ() {
 		return joystick.getZ();
 	}
-}
+	
+	public double getJoystickThrottle() {
+		return joystick.getThrottle();
+	}
 
+	public double getJoystickTwist() {
+		return joystick.getTwist();
+	}
+}
