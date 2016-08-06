@@ -23,7 +23,7 @@ public class DriveTrain extends Subsystem {
 	private AnalogGyro gyro;
 	public PIDSource frontPIDSource, backPIDSource, gyroPIDSource;
 	public PIDMain frontPID, backPID, gyroPID;
-	
+
 	public DriveTrain() {
 		frontLeftCIM = new Jaguar(RobotMap.frontLeftCIMPort);
 		frontRightCIM = new Jaguar(RobotMap.frontRightCIMPort);
@@ -31,12 +31,12 @@ public class DriveTrain extends Subsystem {
 		backRightCIM = new Jaguar(RobotMap.backRightCIMPort);
 		frontTurn = new CANTalon(RobotMap.frontTurnMotorPort);
 		backTurn = new CANTalon(RobotMap.backTurnMotorPort);
-		
+
 		frontEncoder = new Encoder(RobotMap.frontEncoderAPort, RobotMap.frontEncoderBPort);
 		backEncoder = new Encoder(RobotMap.backEncoderAPort, RobotMap.backEncoderBPort);
 
 		gyro = new AnalogGyro(RobotMap.gyroPort);
-		
+
 		frontPIDSource = new PIDSource() {
 			public double getInput() {
 				SmartDashboard.putNumber("InputFront", frontEncoder.get());
@@ -51,14 +51,27 @@ public class DriveTrain extends Subsystem {
 		};
 		gyroPIDSource = new PIDSource() {
 			public double getInput() {
-				//SmartDashboard.putNumber("GyroInput", gyro.getAngle());
+				// SmartDashboard.putNumber("GyroInput", gyro.getAngle());
 				return gyro.getAngle();
 			}
 		};
 
-		frontPID = new PIDMain(frontPIDSource, 0, 100, 0.005, 0.0007, 0.0);//controls front motor angle
-		backPID = new PIDMain(backPIDSource, 0, 100, 0.005, 0.0007, 0.0);//controls back motor angle
-		gyroPID = new PIDMain(gyroPIDSource, 0, 100, 0.005, 0.000, 0.0);//PID control for driving diagonal
+		frontPID = new PIDMain(frontPIDSource, 0, 150, 0.004, 0.0008, 0.0);// controls
+																			// front
+																			// motor
+																			// angle
+		backPID = new PIDMain(backPIDSource, 0, 150, 0.004, 0.00075, 0.0);// controls
+																			// back
+																			// motor
+																			// angle
+		gyroPID = new PIDMain(gyroPIDSource, 0, 150, 0.0005, 0.000, 0.0);// PID
+																			// control
+																			// for
+																			// driving
+																			// diagonal
+		gyroPID.setOutputLimits(-0.2, 0.2);
+		backPID.setOutputLimits(-0.75, 0.75);
+		frontPID.setOutputLimits(-0.75, 0.75);
 	}
 
 	public void initDefaultCommand() {
@@ -90,7 +103,10 @@ public class DriveTrain extends Subsystem {
 		backRightCIM.set(-backRight);
 		frontTurn.set(frontRotation);
 		backTurn.set(backRotation);
+		SmartDashboard.putNumber("Back-front", backLeft-frontRight);
+		
 	}
+
 	/**
 	 * @param frontSetpoint
 	 *            sets the desired target value of front motors PID
@@ -100,57 +116,69 @@ public class DriveTrain extends Subsystem {
 	private void turnDrive(double frontSetpoint, double backSetpoint) {
 		frontPID.setSetpoint(frontSetpoint);
 		backPID.setSetpoint(backSetpoint);
-	}	
+	}
+
 	/**
 	 * PID Control for going diagonal
 	 * 
 	 * @param setpoint
-	 * 			the current heading of the robot
-	 * 			set the setpoint to this value to ensure the robot 
-	 * 			continues to travel straight
+	 *            the current heading of the robot set the setpoint to this
+	 *            value to ensure the robot continues to travel straight
 	 * @param y
-	 * 			the raw power from the joystick
+	 *            the raw power from the joystick
 	 */
-	public void diagonalDrive(double y, double currentHeading,double frontSetpoint, double backSetpoint)	{
+	public void diagonalDrive(double y, double currentHeading, double frontSetpoint, double backSetpoint) {
 		turnDrive(frontSetpoint, backSetpoint);
 		gyroPID.setSetpoint(currentHeading);
-		double turnCorrection = Math.abs(getGyro());
-		if (getGyro() < 0) {
-			drive(y + turnCorrection, y + turnCorrection, y, y,
-					constrain(getFrontOutput(), -0.5, 0.5),
-					constrain(getBackOutput(), -0.5, 0.5));
-		} else {
-			drive(y, y, y + turnCorrection, y + turnCorrection,
-					constrain(getFrontOutput(), -0.5, 0.5),
-					constrain(getBackOutput(), -0.5, 0.5));
+		double turnCorrection = 0;
+		if (Math.abs(y) > 0) {
+			turnCorrection = Math.abs(gyroPID.getOutput());
+			SmartDashboard.putNumber("outputgyro", turnCorrection);
+		}
+		if (frontSetpoint < 0) {
+			if (gyroPID.getError() < 0) {
+				drive(y + turnCorrection, y + turnCorrection, y, y, getFrontOutput(), getBackOutput());
+			} else {
+				drive(y, y, y + turnCorrection, y + turnCorrection, getFrontOutput(), getBackOutput());
+			}
+		}	else {
+			if (gyroPID.getError()  > 0) {
+				drive(y + turnCorrection, y + turnCorrection, y, y, getFrontOutput(), getBackOutput());
+			} else {
+				drive(y, y, y + turnCorrection, y + turnCorrection, getFrontOutput(), getBackOutput());
+			}
 		}
 	}
+
 	/**
 	 * @param y
-	 * 		the raw power from the joystick
+	 *            the raw power from the joystick
 	 */
-	public void swerveDrive(double y , double frontSetpoint, double backSetpoint){
+	public void swerveDrive(double y, double frontSetpoint, double backSetpoint) {
 		turnDrive(frontSetpoint, backSetpoint);
-		drive(y, y, y, y, constrain(getFrontOutput(), -0.75, 0.75),
-				constrain(getBackOutput(), -0.75, 0.75));
+		drive(y, y, y, y, getFrontOutput(), getBackOutput());
 	}
-	
+
 	public void stop() {
 		drive(0, 0, 0, 0, 0, 0);
 	}
-	public double getGyro()	{
+
+	public double getGyro() {
 		return gyroPID.getInput();
 	}
+
 	public double constrain(double x, double lowerLimit, double upperLimit) {
 		x = x > upperLimit ? upperLimit : x;
 		x = x < lowerLimit ? lowerLimit : x;
 		return x;
 	}
+
 	public double getFrontOutput() {
 		return frontPID.getOutput();
 	}
+
 	public double getBackOutput() {
 		return backPID.getOutput();
 	}
-	
+
 }

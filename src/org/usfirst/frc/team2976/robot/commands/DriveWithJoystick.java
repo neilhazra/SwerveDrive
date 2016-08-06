@@ -34,12 +34,9 @@ public class DriveWithJoystick extends Command {
 			SmartDashboard.putNumber("Current Heading", currentHeading);
 			Robot.drivetrain.gyroPID.resetPID();
 		} else {
-			//double sign = Math.signum(diagonalright - diagonalleft);
-			currentHeading = Robot.drivetrain.getGyro();
-			SmartDashboard.putNumber("Current Heading Error", currentHeading-Robot.drivetrain.getGyro());
-			
-			Robot.drivetrain.swerveDrive(y, x * 120 * diagonalright, x * 100 * diagonalright);
-			//Robot.drivetrain.diagonalDrive(y, currentHeading,x * 120 * diagonalright, x * 100 * diagonalright);
+			SmartDashboard.putNumber("Current Heading Error", Robot.drivetrain.gyroPID.getError());
+			//Robot.drivetrain.swerveDrive(y, x * 120 * diagonalright, x * 100 * diagonalright);
+			Robot.drivetrain.diagonalDrive(y, currentHeading,x * 120 * diagonalright, x * 100 * diagonalright);
 		}
 	}
 
