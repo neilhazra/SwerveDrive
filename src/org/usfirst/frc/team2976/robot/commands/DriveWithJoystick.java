@@ -17,15 +17,16 @@ public class DriveWithJoystick extends Command {
 	}
 
 	protected void execute() {
-		double y = -Robot.oi.joystick.getRawAxis(OI.Axis.LY.getAxisNumber());
-		double x = -Robot.oi.joystick.getRawAxis(OI.Axis.RX.getAxisNumber());
-		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
-		double diagonalright = Robot.oi.joystick.getRawAxis(OI.Axis.RTrigger.getAxisNumber());
-		double diagonalleft = Robot.oi.joystick.getRawAxis(OI.Axis.LTrigger.getAxisNumber());
+		double y = Robot.oi.getYAxis();
+		double x = Robot.oi.getXAxis();
+//		double rx = -Robot.oi.joystick.getRawAxis(OI.Axis.LX.getAxisNumber());
+//		double rx = 0;
+		double diagonalright = Robot.oi.getDiagonalRight();
+		double diagonalleft = Robot.oi.getDiagonalLeft();
 		
 		x = Math.abs(x) < threshold ? 0 : x;
 		y = Math.abs(y) < threshold ? 0 : y;
-		rx = Math.abs(rx) < threshold ? 0 : rx;
+//		rx = Math.abs(rx) < threshold ? 0 : rx;
 
 		if (diagonalright <= 0.1 && diagonalleft <= 0.1) {
 			double[] temp = map(x);
@@ -61,7 +62,7 @@ public class DriveWithJoystick extends Command {
 		}
 		// constrain to make sure motor does not turn the wheels to far
 		turnDegree[0] = constrain(turnDegree[0], -120, 120);
-		turnDegree[1] = constrain(turnDegree[1], -100, 100);
+		turnDegree[1] = constrain(turnDegree[1], -120, 120);
 		return turnDegree;
 	}
 
