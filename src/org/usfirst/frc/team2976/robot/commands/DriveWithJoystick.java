@@ -37,7 +37,7 @@ public class DriveWithJoystick extends Command {
 		} else {
 			SmartDashboard.putNumber("Current Heading Error", Robot.drivetrain.gyroPID.getError());
 			//Robot.drivetrain.swerveDrive(y, x * 120 * diagonalright, x * 100 * diagonalright);
-			Robot.drivetrain.diagonalDrive(y, currentHeading,x * 120 * diagonalright, x * 100 * diagonalright);
+			Robot.drivetrain.diagonalDrive(y, currentHeading,x * 120 * diagonalright, x * 90 * diagonalright);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class DriveWithJoystick extends Command {
 		}
 		// constrain to make sure motor does not turn the wheels to far
 		turnDegree[0] = constrain(turnDegree[0], -120, 120);
-		turnDegree[1] = constrain(turnDegree[1], -120, 120);
+		turnDegree[1] = constrain(turnDegree[1], -90, 90);
 		return turnDegree;
 	}
 

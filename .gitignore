@@ -3,11 +3,17 @@ bin/
 build/
 dist/
 
+.settings/
 sysProps.xml
+build.xml
+.classpath
+.project
+build.properties
+workbench.xml
+tmp/
 
 # OS Files
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .AppleDouble
