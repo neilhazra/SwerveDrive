@@ -120,7 +120,8 @@ public class PIDMain {
 	}
 
 	/**
-	 * @param sampleTime how quickly to sample and calculate
+	 * @param sampleTime
+	 *            how quickly to sample and calculate
 	 */
 	public void setSampleTime(int sampleTime) {
 		this.sampleTime = sampleTime;

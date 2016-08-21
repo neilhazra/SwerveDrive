@@ -3,7 +3,6 @@ package org.usfirst.frc.team2976.robot.subsystems;
 import org.usfirst.frc.team2976.robot.Robot;
 import org.usfirst.frc.team2976.robot.RobotMap;
 import org.usfirst.frc.team2976.robot.commands.DriveWithJoystick;
-
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
@@ -23,8 +22,23 @@ public class DriveTrain extends Subsystem {
 	private AnalogGyro gyro;
 	public PIDSource frontPIDSource, backPIDSource, gyroPIDSource;
 	public PIDMain frontPID, backPID, gyroPID;
-
+	boolean overamped = false;
+	double maxTurnAmp = 5;
+	
 	public DriveTrain() {
+		double frontKp = 0.01;//PIDPrefs.getDouble("FrontPIDP", 0.004);
+		double frontKi = 0.00;//PIDPrefs.getDouble("FrontPIDI", 0.0008);
+		double frontKd = 0.0;//PIDPrefs.getDouble("FrontPIDD", 0.0);
+		
+		double backKp = 0.01;//PIDPrefs.getDouble("BackPIDP", 0.004);
+		double backKi = 0.00;//PIDPrefs.getDouble("BackPIDI", 0.00075);
+		double backKd = 0.0;//PIDPrefs.getDouble("BackPIDD", 0.0);
+		
+		double gyroKp = 0.0005;//PIDPrefs.getDouble("GyroPIDP", 0.0005);
+		double gyroKi = 0.00;//PIDPrefs.getDouble("GyroPIDI", 0.00);
+		double gyroKd = 0.0;//PIDPrefs.getDouble("GyroPIDD", 0.0);
+		
+		
 		frontLeftCIM = new Jaguar(RobotMap.frontLeftCIMPort);
 		frontRightCIM = new Jaguar(RobotMap.frontRightCIMPort);
 		backLeftCIM = new Jaguar(RobotMap.backLeftCIMPort);
@@ -51,27 +65,19 @@ public class DriveTrain extends Subsystem {
 		};
 		gyroPIDSource = new PIDSource() {
 			public double getInput() {
-				// SmartDashboard.putNumber("GyroInput", gyro.getAngle());
+				SmartDashboard.putNumber("GyroInput", gyro.getAngle());
 				return gyro.getAngle();
 			}
 		};
 
-		frontPID = new PIDMain(frontPIDSource, 0, 150, 0.004, 0.0008, 0.0);// controls
-																			// front
-																			// motor
-																			// angle
-		backPID = new PIDMain(backPIDSource, 0, 150, 0.004, 0.00075, 0.0);// controls
-																			// back
-																			// motor
-																			// angle
-		gyroPID = new PIDMain(gyroPIDSource, 0, 150, 0.0005, 0.000, 0.0);// PID
-																			// control
-																			// for
-																			// driving
-																			// diagonal
+		frontPID = new PIDMain(frontPIDSource, 0, 150, frontKp, frontKi, frontKd);													// angle
+		backPID = new PIDMain(backPIDSource, 0, 150, backKp, backKi, backKd);
+		gyroPID = new PIDMain(gyroPIDSource, 0, 150, gyroKp, gyroKi, gyroKd);
+		/*
 		gyroPID.setOutputLimits(-0.2, 0.2);
 		backPID.setOutputLimits(-0.75, 0.75);
 		frontPID.setOutputLimits(-0.75, 0.75);
+		*/
 	}
 
 	public void initDefaultCommand() {
@@ -97,12 +103,27 @@ public class DriveTrain extends Subsystem {
 	 */
 	private void drive(double frontLeft, double frontRight, double backLeft, double backRight, double frontRotation,
 			double backRotation) {
+		
+		//If any of the turning motors are drawing too much power, set overamped to true
+		if(((CANTalon)frontTurn).getOutputCurrent()>maxTurnAmp || ((CANTalon)backTurn).getOutputCurrent()>maxTurnAmp)	{ 
+			overamped = true;
+		}
+		//if any button on the D-Pad is pressed resume normal turning operation
+		if(Robot.oi.joystick.getPOV() != -1)	{ 
+			overamped = false;
+		}
+		
+		if(!overamped)	{
+			frontTurn.set(frontRotation);
+			backTurn.set(backRotation);
+		}	else	{
+			frontTurn.set(0);
+			backTurn.set(0);
+		}
 		frontLeftCIM.set(-frontLeft);
 		frontRightCIM.set(frontRight);
 		backLeftCIM.set(-backLeft);
-		backRightCIM.set(-backRight);
-		frontTurn.set(frontRotation);
-		backTurn.set(backRotation);
+		backRightCIM.set(-backRight);	
 		SmartDashboard.putNumber("Back-front", backLeft-frontRight);
 		
 	}
@@ -180,5 +201,4 @@ public class DriveTrain extends Subsystem {
 	public double getBackOutput() {
 		return backPID.getOutput();
 	}
-
 }
